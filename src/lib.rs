@@ -14,7 +14,7 @@ use std::num;
 
 use serialize::{Encodable, Decodable};
 
-mod rpc;
+//mod rpc;
 
 #[derive(Show)]
 pub enum Value {
@@ -173,7 +173,7 @@ impl<R: Reader> Decoder<R> {
         Ok(Value::Extended(typ, try!(self.rd.read_exact(len))))
     }
 
-    fn decode_value(&mut self) -> IoResult<Value> {
+    pub fn decode_value(&mut self) -> IoResult<Value> {
         let c = try!(self._read_byte());
         match c {
             0xc0         => Ok(Value::Nil),
@@ -249,8 +249,6 @@ impl<R: Reader> Decoder<R> {
             _            => unreachable!()
         }
     }
-
-
 }
 
 impl<R: Reader> serialize::Decoder for Decoder<R> {
@@ -519,12 +517,6 @@ impl<R: Reader> serialize::Decoder for Decoder<R> {
     }
 }
 
-impl serialize::Decodable for Value {
-    fn decode<D: serialize::Decoder>(s: &mut D) -> Result<Value, D::Error> {
-        serialize::Decodable::decode(s)
-    }
-}
-
 /// A structure for implementing serialization to Msgpack.
 pub struct Encoder<'a> {
     wr: &'a mut (io::Writer + 'a)
@@ -702,13 +694,14 @@ impl<'a> serialize::Encoder for Encoder<'a> {
     }
 
     fn emit_enum<F>(&mut self, _name: &str, f: F) -> IoResult<()>
-    where F: FnOnce(&mut Encoder<'a>) -> IoResult<()> {
+        where F: FnOnce(&mut Encoder<'a>) -> IoResult<()>
+    {
         f(self)
     }
 
     fn emit_enum_variant<F>(&mut self, name: &str, _id: usize, cnt: usize, f: F) -> IoResult<()>
     where F: FnOnce(&mut Encoder<'a>) -> IoResult<()> {
-        self.emit_seq(cnt + 1, |d| { d.emit_str(name) });
+//        self.emit_seq(cnt + 1, |d| { d.emit_str(name) });
         f(self)
     }
 
